@@ -1,4 +1,4 @@
-# elelem.sh - Easily Extract Project Files for LLM Integration
+# elelem.sh - easily extract project files for LLM integration
 
 `elelem.sh` is a Bash script that simplifies extracting relevant files from your project directory for use with Large Language Models (LLMs). It filters files by extension and search patterns, excluding common directories by default.
 
