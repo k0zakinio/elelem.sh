@@ -39,5 +39,8 @@ This finds `txt`, `md`, and `py` files containing "README" or "config", excludin
     sudo chmod +x /usr/local/bin/elelem.sh /usr/local/bin/estimate_tokens.py
     ```
 
+## Excluding directories
+   Add another entry to the `excluded_dirs` array in the elelem.sh script.
+
 Now you can run `elelem` from any directory.
 
