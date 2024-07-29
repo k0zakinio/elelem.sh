@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Excluded directories
+excluded_dirs=(build node_modules out)
+
 # Function to print usage
 print_usage() {
     echo "Usage: $0 [--include pattern1] [--include pattern2] ... <extension1> [extension2] ..."
@@ -33,16 +36,6 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Function to match files
-match_files() {
-    local include_pattern="$1"
-    shift
-    local extension_patterns=("$@")
-    
-    find . -type d \( -name build -o -name node_modules -o -name out \) -prune -o -type f \( "${extension_patterns[@]}" \) -print | 
-        grep -iE "$include_pattern"
-}
-
 # Function to format file content
 format_file_content() {
     local file="$1"
@@ -62,6 +55,13 @@ done
 # Remove the first "-o" from the array
 extension_conditions=("${extension_conditions[@]:1}")
 
+# Build exclude conditions dynamically
+exclude_conditions=()
+for dir in "${excluded_dirs[@]}"; do
+    exclude_conditions+=(-o -name "$dir")
+done
+exclude_conditions=("${exclude_conditions[@]:1}")  # Remove initial "-o"
+
 # Debug information
 echo "Debug: Current working directory: $(pwd)" >&2
 echo "Debug: Include patterns: ${include_patterns[@]}" >&2
@@ -72,12 +72,10 @@ echo "Debug: Extension conditions: ${extension_conditions[@]}" >&2
 # Main logic
 matched_files=()
 clipboard_content=""
+
+find_command="find . -type d \( ${exclude_conditions[@]} \) -prune -o -type f \( ${extension_conditions[@]} \)"
 if [[ ${#include_patterns[@]} -gt 0 ]]; then
-    echo "Debug: Matching files with include patterns" >&2
-    find_command="find . -type d \( -name build -o -name node_modules -o -name out \) -prune -o -type f \( ${extension_conditions[@]} \) -print | grep -iE \"$include_pattern\""
-else
-    echo "Debug: Matching files without include patterns" >&2
-    find_command="find . -type d \( -name build -o -name node_modules -o -name out \) -prune -o -type f \( ${extension_conditions[@]} \) -print"
+    find_command+=" | grep -iE \"$include_pattern\""
 fi
 
 echo "Debug: Executing find command: $find_command" >&2
@@ -89,7 +87,7 @@ done < <(eval "$find_command" | sort -u)
 # Copy to clipboard
 echo "$clipboard_content" | pbcopy
 
-# Estimate token count
+# Estimate token count 
 script_dir=$(dirname "$0")
 token_count=$(echo "$clipboard_content" | "$script_dir/estimate_tokens.py")
 
