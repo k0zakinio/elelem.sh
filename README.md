@@ -22,10 +22,10 @@
 **Example:**
 
 ```bash
-elelem --include "README" --include "config" .txt .md .py
+elelem --include "README" --include "config" txt md py
 ```
 
-This finds `.txt`, `.md`, and `.py` files containing "README" or "config", excluding common build directories.
+This finds `txt`, `md`, and `py` files containing "README" or "config", excluding common build directories.
 
 ## Installation on macOS
 
